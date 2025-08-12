@@ -1,0 +1,25 @@
+[project]
+name = "soccer-analytics"
+version = "0.1.0"
+description = "CSV → metrics → static HTML report for Soccer (multi-tournament)."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "pandas>=2.0.0",
+  "pyarrow>=14.0.0",
+  "typer[all]>=0.12.0",
+  "jinja2>=3.1.0"
+]
+
+[project.scripts]
+soccer = "soccer.cli:run"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
