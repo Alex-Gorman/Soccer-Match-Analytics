@@ -85,6 +85,10 @@ data/
 - Calibration (Brier score, reliability curve)
 - Optional feature store (DuckDB/Parquet)
 
+## Releases
+[Unreleased]: https://github.com/Alex-Gorman/Soccer-Match-Analytics/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Alex-Gorman/Soccer-Match-Analytics/releases/tag/v0.1.0
+
 
 
 
