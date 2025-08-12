@@ -1,0 +1,300 @@
+<!-- Add a top nav somewhere near the top -->
+<nav style="display:flex; gap:12px; margin:12px 0;">
+  <a href="#overview">Overview</a>
+  <a href="#opponents">Opponents</a>
+  <a href="#maps">Maps</a>
+  <a href="#tournaments">Tournaments</a>
+  <a href="#phases">Group vs Knockout</a>
+</nav>
+
+<!-- Wrap each block in a section with a route name -->
+<section id="page-overview" data-route="overview">
+  <!-- your KPIs go here -->
+</section>
+
+<section id="page-opponents" data-route="opponents">
+  <!-- Opponents table; add data-name so we can click rows -->
+  <table id="oppTable">
+    <thead>…</thead>
+    <tbody>
+      {% for row in summary.opponents.to_dict(orient='records') %}
+      <tr data-name="{{ row['opponent'] }}">
+        <td>{{ row['opponent'] }}</td>
+        <td>{{ row['games'] }}</td>
+        <td>{{ row['wins'] }}</td>
+        <td>{{ row['losses'] }}</td>
+        <td>{{ (row['win_pct']*100)|round(1) }}</td>
+        <td>{{ row['goals_for'] }}</td>
+        <td>{{ row['goals_against'] }}</td>
+        <td>{{ row['goal_diff'] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section id="page-maps" data-route="maps">
+  <!-- your Maps table -->
+</section>
+
+<section id="page-tournaments" data-route="tournaments">
+  <!-- your Tournaments table -->
+</section>
+
+<section id="page-phases" data-route="phases">
+  <!-- your Phases table -->
+</section>
+
+<!-- A detail "page" we’ll populate when you click an opponent -->
+<section id="page-opponent-detail" data-route="opponent" style="display:none;">
+  <button id="backBtn">← Back</button>
+  <h2 id="oppTitle"></h2>
+  <div id="oppSummary"></div>
+</section>
+
+<script>
+  // Minimal router: #overview, #opponents, #opponent/<Name>, etc.
+  function showSection(name) {
+    document.querySelectorAll('section[data-route]').forEach(s => {
+      s.style.display = (s.dataset.route === name) ? "" : "none";
+    });
+  }
+
+  function route() {
+    const hash = location.hash.slice(1) || "overview";         // e.g., "opponent/Yoshi"
+    const [page, ...rest] = hash.split("/");
+    const param = rest.join("/");
+    if (page === "opponent") {
+      showSection("opponent");
+      renderOpponent(decodeURIComponent(param || ""));
+    } else if (["overview","opponents","maps","tournaments","phases"].includes(page)) {
+      showSection(page);
+    } else {
+      showSection("overview");
+    }
+  }
+
+  // Wire clicks on opponent rows to navigate to detail page
+  const oppTable = document.getElementById("oppTable");
+  if (oppTable) {
+    oppTable.addEventListener("click", (e) => {
+      const tr = e.target.closest("tr[data-name]");
+      if (!tr) return;
+      const name = tr.getAttribute("data-name");
+      location.hash = "opponent/" + encodeURIComponent(name);
+    });
+  }
+
+  // Back button
+  const backBtn = document.getElementById("backBtn");
+  if (backBtn) backBtn.addEventListener("click", () => history.back());
+
+  // Simple detail renderer using the aggregated opponents table already on the page
+  function renderOpponent(name) {
+    const title = document.getElementById("oppTitle");
+    const box = document.getElementById("oppSummary");
+    title.textContent = name || "Opponent";
+
+    // Pull data from the visible table (no extra JSON needed)
+    const rows = Array.from(document.querySelectorAll('#oppTable tbody tr'));
+    const row = rows.find(r => r.getAttribute("data-name") === name);
+    if (!row) { box.textContent = "No data."; return; }
+    const cells = row.cells;
+    const obj = {
+      opponent: cells[0].innerText,
+      games:    +cells[1].innerText,
+      wins:     +cells[2].innerText,
+      losses:   +cells[3].innerText,
+      win_pct:  parseFloat(cells[4].innerText),
+      gf:       +cells[5].innerText,
+      ga:       +cells[6].innerText,
+      gd:       +cells[7].innerText
+    };
+    box.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(4, minmax(120px,1fr)); gap:12px;">
+        <div><div class="muted small">Games</div><div class="value">${obj.games}</div></div>
+        <div><div class="muted small">Win %</div><div class="value">${obj.win_pct.toFixed(1)}%</div></div>
+        <div><div class="muted small">GF / GA</div><div class="value">${obj.gf} / ${obj.ga}</div></div>
+        <div><div class="muted small">Goal Diff</div><div class="value">${obj.gd}</div></div>
+      </div>
+    `;
+  }
+
+  window.addEventListener("hashchange", route);
+  window.addEventListener("DOMContentLoaded", route);
+</script>
+
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Strikers Analytics — Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 2rem; color: #111; }
+    h1, h2 { margin-bottom: 0.25rem; }
+    .muted { color: #6b7280; }
+    .small { font-size: 12px; }
+    .section { margin-top: 2rem; }
+    .kpis { display: grid; grid-template-columns: repeat(5, minmax(120px, 1fr)); gap: 12px; margin: 1rem 0 2rem; }
+    .kpi { border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; background: #fafafa; }
+    .kpi .label { color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+    .kpi .value { font-weight: 700; font-size: 22px; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0 2rem; }
+    th, td { border: 1px solid #e5e7eb; padding: 8px 10px; text-align: left; font-size: 14px; }
+    th { background: #f3f4f6; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  </style>
+</head>
+<body>
+  <h1>Strikers Analytics — Report</h1>
+  <div class="muted small">Stage 1 • CSV → metrics → static HTML</div>
+
+  <!-- KPIs -->
+  <div class="kpis">
+    <div class="kpi"><div class="label">Games</div><div class="value">{{ summary.overall.games }}</div></div>
+    <div class="kpi"><div class="label">Wins</div><div class="value">{{ summary.overall.wins }}</div></div>
+    <div class="kpi"><div class="label">Losses</div><div class="value">{{ summary.overall.losses }}</div></div>
+    <div class="kpi"><div class="label">Win %</div><div class="value">{{ (summary.overall.win_pct * 100) | round(1) }}%</div></div>
+    <div class="kpi"><div class="label">Goal Diff</div><div class="value">{{ summary.overall.goal_diff }}</div></div>
+  </div>
+
+  <div class="grid">
+    <!-- Opponents -->
+    <div class="section">
+      <h2>Opponents</h2>
+      <table>
+        <thead>
+          <tr><th>Opponent</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th></tr>
+        </thead>
+        <tbody>
+          {% if summary.opponents is not none and not summary.opponents.empty %}
+            {% for row in summary.opponents.to_dict(orient='records') %}
+              <tr>
+                <td>{{ row['opponent'] }}</td>
+                <td>{{ row['games'] }}</td>
+                <td>{{ row['wins'] }}</td>
+                <td>{{ row['losses'] }}</td>
+                <td>{{ (row['win_pct']*100)|round(1) }}%</td>
+                <td>{{ row['goals_for'] }}</td>
+                <td>{{ row['goals_against'] }}</td>
+                <td>{{ row['goal_diff'] }}</td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="8" class="muted">No opponent data.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Maps -->
+    <div class="section">
+      <h2>Maps</h2>
+      <table>
+        <thead>
+          <tr><th>Map</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th></tr>
+        </thead>
+        <tbody>
+          {% if summary.maps is not none and not summary.maps.empty %}
+            {% for row in summary.maps.to_dict(orient='records') %}
+            <tr>
+              <td>{{ row['map'] }}</td>
+              <td>{{ row['games'] }}</td>
+              <td>{{ row['wins'] }}</td>
+              <td>{{ row['losses'] }}</td>
+              <td>{{ (row['win_pct']*100)|round(1) }}%</td>
+              <td>{{ row['goals_for'] }}</td>
+              <td>{{ row['goals_against'] }}</td>
+              <td>{{ row['goal_diff'] }}</td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="8" class="muted">No map data.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Home vs Away -->
+  {% if summary.home_away is not none and not summary.home_away.empty %}
+  <div class="section">
+    <h2>Home vs Away</h2>
+    <table>
+      <thead>
+        <tr><th>H/A</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th></tr>
+      </thead>
+      <tbody>
+        {% for row in summary.home_away.to_dict(orient='records') %}
+        <tr>
+          <td>{{ row['home_or_away'] }}</td>
+          <td>{{ row['games'] }}</td>
+          <td>{{ row['wins'] }}</td>
+          <td>{{ row['losses'] }}</td>
+          <td>{{ (row['win_pct']*100)|round(1) }}%</td>
+          <td>{{ row['goals_for'] }}</td>
+          <td>{{ row['goals_against'] }}</td>
+          <td>{{ row['goal_diff'] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <!-- Tournaments -->
+  {% if summary.tournaments is not none and not summary.tournaments.empty %}
+  <div class="section">
+    <h2>Tournaments</h2>
+    <table>
+      <thead>
+        <tr><th>Tournament #</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th></tr>
+      </thead>
+      <tbody>
+        {% for row in summary.tournaments.to_dict(orient='records') %}
+        <tr>
+          <td>{{ row['tournament_no'] }}</td>
+          <td>{{ row['games'] }}</td>
+          <td>{{ row['wins'] }}</td>
+          <td>{{ row['losses'] }}</td>
+          <td>{{ (row['win_pct']*100)|round(1) }}%</td>
+          <td>{{ row['goals_for'] }}</td>
+          <td>{{ row['goals_against'] }}</td>
+          <td>{{ row['goal_diff'] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <!-- Group vs Knockout -->
+  {% if summary.phases is not none and not summary.phases.empty %}
+  <div class="section">
+    <h2>Group vs Knockout</h2>
+    <table>
+      <thead>
+        <tr><th>Phase</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th></tr>
+      </thead>
+      <tbody>
+        {% for row in summary.phases.to_dict(orient='records') %}
+        <tr>
+          <td>{{ row['phase'] }}</td>
+          <td>{{ row['games'] }}</td>
+          <td>{{ row['wins'] }}</td>
+          <td>{{ row['losses'] }}</td>
+          <td>{{ (row['win_pct']*100)|round(1) }}%</td>
+          <td>{{ row['goals_for'] }}</td>
+          <td>{{ row['goals_against'] }}</td>
+          <td>{{ row['goal_diff'] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+</body>
+</html>
