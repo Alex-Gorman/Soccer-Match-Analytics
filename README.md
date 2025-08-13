@@ -1,5 +1,6 @@
 # Soccer-Match-Analytics
 Sports analytics pipeline: CSV → metrics → static HTML report
+[Soccer Match Analytics](https://alex-gorman.github.io/Soccer-Match-Analytics/)
 
 ---
 
