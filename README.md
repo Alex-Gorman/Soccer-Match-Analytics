@@ -30,7 +30,8 @@ make
 ```bash
 python -m venv .venv && source .venv/bin/activate
 python -m pip install -e .
-soccer --input data/tournament_01.csv --out out/
+soccer --input data/tournament_01.csv --out out/ \
+  --use-elo --elo-k 20 --elo-home-adv 50
 # macOS:
 open out/report.html
 ```
@@ -93,11 +94,14 @@ pytest tests/integration -q
 pytest tests/smoke -q
 ```
 
-## Roadmap (Stage 2)
-- Elo ratings and pre-match win probabilities
-- Opponent scouting pages (recent H2H, best maps, tendencies)
-- Calibration (Brier score, reliability curve)
-- Optional feature store (DuckDB/Parquet)
+## Stage 2 status
+- [x] Elo engine + p(win)
+- [x] Report: Elo card + Recent matches table with Δ and bars
+- [x] CLI flags (`--use-elo`, `--elo-k`, `--elo-home-adv`)
+- [ ] Calibration (Brier score, reliability curve)
+- [ ] Opponent scouting pages
+- [ ] Optional feature store (DuckDB/Parquet)
+
 
 ## Releases
 - [Unreleased](https://github.com/Alex-Gorman/Soccer-Match-Analytics/compare/v0.1.0...HEAD)
