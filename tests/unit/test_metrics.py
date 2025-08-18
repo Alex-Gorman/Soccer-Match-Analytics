@@ -152,7 +152,7 @@ def test_opponents_group_and_goal_share(df_small):
 
 
 def test_phases_present_when_column_exists(df_small):
-     """Phase breakdown exists and includes both Group and Knockout."""
+    """Phase breakdown exists and includes both Group and Knockout."""
 
     # ---------- Act ---------- 
     sample_test = build_summary(df_small)
