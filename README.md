@@ -1,8 +1,10 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+
 # Soccer-Match-Analytics
 Sports analytics pipeline: CSV → metrics → static HTML report
 [Soccer Match Analytics](https://alex-gorman.github.io/Soccer-Match-Analytics/)
 
----
 
 ## Features (Stage 1)
 - Ingest multi-tournament CSV
@@ -14,7 +16,25 @@ Sports analytics pipeline: CSV → metrics → static HTML report
   - `matches.parquet`
   - `summary_opponents.csv`, `summary_maps.csv`, `summary_tournaments.csv`
 
----
+
+## Quick start
+
+### Option A — one command (recommended)
+
+```bash
+make
+```
+
+### Option B — manual
+
+```bash
+python -m venv .venv && source .venv/bin/activate
+python -m pip install -e .
+soccer --input data/tournament_01.csv --out out/
+# macOS:
+open out/report.html
+```
+
 
 ## Data schema (CSV)
 
@@ -41,27 +61,7 @@ Required header row must match these columns:
 
 Derived in the pipeline: `result` (`W`/`L`), `phase` (`Group`/`Knockout`), `goal_diff`.
 
----
 
-## Quick start
-
-### Option A — one command (recommended)
-
-```bash
-make
-```
-
-### Option B — manual
-
-```bash
-python -m venv .venv && source .venv/bin/activate
-python -m pip install -e .
-soccer --input data/tournament_01.csv --out out/
-# macOS:
-open out/report.html
-```
-
----
 
 ## Project structure
 ```
@@ -78,7 +78,20 @@ data/
   tournament_01.csv  # sample dataset
 ```
 
----
+## Testing
+```bash
+# run everything
+pytest -q
+
+# only unit tests
+pytest tests/unit -q
+
+# only integration tests
+pytest tests/integration -q
+
+# only smoke tests
+pytest tests/smoke -q
+```
 
 ## Roadmap (Stage 2)
 - Elo ratings and pre-match win probabilities
