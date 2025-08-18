@@ -84,7 +84,7 @@
       <h2>Maps</h2>
       <table>
         <thead>
-           <tr><th>Opponent</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
+           <tr><th>Map</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
         </thead>
         <tbody>
           {% if summary.maps is not none and not summary.maps.empty %}
@@ -117,7 +117,7 @@
       <h2>Home vs Away</h2>
       <table>
         <thead>
-          <tr><th>Opponent</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
+          <tr><th>Home or Away</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
         </thead>
         <tbody>
           {% for row in summary.home_away.to_dict(orient='records') %}
@@ -147,7 +147,7 @@
       <h2>Tournaments</h2>
       <table>
         <thead>
-          <tr><th>Opponent</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
+          <tr><th>Tournament #</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
         </thead>
         <tbody>
           {% for row in summary.tournaments.to_dict(orient='records') %}
@@ -177,7 +177,7 @@
       <h2>Group vs Knockout</h2>
       <table>
         <thead>
-          <tr><th>Opponent</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
+          <tr><th>Stage</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
         </thead>
         <tbody>
           {% for row in summary.phases.to_dict(orient='records') %}
@@ -201,16 +201,7 @@
     </div>
     {% endif %}
 
-    
-
-    
-
-    
-
-
-
-
-
+  
   </div>
 </main>
 </body>
