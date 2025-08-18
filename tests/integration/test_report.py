@@ -20,7 +20,7 @@ from soccer.metrics import build_summary
 from soccer.report import build_html_report
 
 def test_report_writes_file(tmp_path: Path):
-     """End-to-end smoke of report rendering using a tiny in-memory dataset.
+    """End-to-end smoke of report rendering using a tiny in-memory dataset.
 
     The `tmp_path` fixture gives an isolated temp directory for this test run.
     Write the output report there and assert it exists and contains the
