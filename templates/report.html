@@ -201,6 +201,121 @@
     </div>
     {% endif %}
 
+    
+    {% if summary.elo %}
+      <div class="section">
+        <h2>Elo & Win Probabilities</h2>
+          {% if summary.elo.recent_summary %}
+            {% set S = summary.elo.recent_summary %}
+            <div class="muted small">
+              Record (last {{ S.n }}): {{ S.wins }}–{{ S.losses }} ·
+              Avg p(win): {{ (S.avg_p * 100) | round(1) }}% ·
+              Expected wins: {{ S.exp_wins | round(2) }} ·
+              Δ wins: {{ S.over_under | round(2) }}
+            </div>
+          {% endif %}
+        <!-- <div class="muted small">Current Elo (team_player): {{ summary.elo.team_player | round(0) }}</div> -->
+         <div class="muted small"> Current Elo: {{(summary.elo.table | selectattr('entity','equalto','team_player') | map(attribute='rating') | first) | round(0)}} </div>
+
+        <details>
+          <summary>Final ratings (team_player + opponents)</summary>
+          <table>
+            <thead><tr><th>Entity</th><th>Elo</th></tr></thead>
+            <tbody>
+              {% for row in summary.elo.table %}
+                <tr><td>{{ row['entity'] }}</td><td>{{ row['rating'] | round(0) }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </details>
+
+        <!-- <details>
+          <summary>Recent matches — pre-match p(win)</summary>
+            <table>
+            <thead>
+              <tr><th>Date</th><th>Opponent</th><th>H/A</th><th>Result</th><th>p(win)</th></tr>
+            </thead>
+            <tbody>
+              {% for r in summary.recent %}
+                <tr>
+                  <td>{{ r['date'] }}</td>
+                  <td>{{ r['opponent'] }}</td>
+                  <td>{{ r['home_or_away'] }}</td>
+                  <td>{{ r['result'] }}</td>
+                  <td>{{ r['p_win_pre'] }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </details> -->
+
+        <details>
+          <summary>Recent matches — pre-match p(win)</summary>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Opponent</th>
+                <th>H/A</th>
+                <th>Result</th>
+                <th>p(win)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in summary.recent %}
+                {% set d = r['delta'] %}
+                <tr class="{% if r['underdog_win'] %}up-win{% elif r['favored_loss'] %}up-loss{% endif %}">
+                  <td>{{ r['date_str'] }}</td>
+                  <td>{{ r['opponent'] }}</td>
+                  <td>{{ r['home_or_away'] }}</td>
+                  <td>{{ r['result'] }}</td>
+
+                  <td>
+                    <div class="smallbar">
+                      <span style="width: {{ (r['p_win_pre'] * 100) | round(0) }}%"></span>
+                    </div>
+                    <span class="muted small">{{ (r['p_win_pre'] * 100) | round(0) }}%</span>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </details>
+
+
+
+      </div>
+    {% endif %}
+
+
+    <!-- Recent matches
+    {% if summary.recent %}
+      <div class="card">
+        <h3>Recent Matches</h3>
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Opponent</th><th>H/A</th><th>Result</th><th>p(win)</th></tr>
+          </thead>
+          <tbody>
+            {% for r in summary.recent %}
+              <tr>
+                <td>{{ r['date'] }}</td>
+                <td>{{ r['opponent'] }}</td>
+                <td>{{ r['home_or_away'] }}</td>
+                <td>{{ r['result'] }}</td>
+                <td>{{ r['p_win_pre'] }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %} -->
+
+
+
+
+
+
   
   </div>
 </main>
