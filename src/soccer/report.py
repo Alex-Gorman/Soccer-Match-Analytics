@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Dict, Any
 
 import pandas as pd
+import shutil
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 
@@ -60,3 +61,20 @@ def build_html_report(df: pd.DataFrame, summary: Dict[str, Any], out_path: Path)
     html = template.render(summary=summary)
     out_path = Path(out_path)
     out_path.write_text(html, encoding="utf-8")
+
+    # --- Copy styles.css next to the generated HTML (so relative <link> works) ---
+    # Prefer the directory the template actually loaded from.
+    tpl_dir = Path(getattr(template, "filename", "")).parent if getattr(template, "filename", None) else None
+    if not tpl_dir or not tpl_dir.exists():
+        # Fallbacks if template.filename isn’t available
+        # repo-root/templates
+        tpl_dir = Path(__file__).resolve().parents[3] / "templates"
+        if not tpl_dir.exists():
+            # second fallback: src/../templates (just in case)
+            tpl_dir = Path(__file__).resolve().parents[2] / "templates"
+
+    src_css = tpl_dir / "styles.css"
+    dst_css = out_path.parent / "styles.css"
+    if src_css.exists():
+        dst_css.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src_css, dst_css)
