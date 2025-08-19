@@ -5,7 +5,9 @@
   <title>Soccer Analytics — Report</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- <link rel="stylesheet" href="./styles.css"> -->
-  <style>
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- <style>
     
     body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 2rem; color: #111; }
     h1, h2 { margin-bottom: 0.25rem; }
@@ -23,7 +25,7 @@
     .table-wrap { overflow-x: auto; }
     /* table { min-width: 900px; } */ /* or 1100px if you keep many columns */
     
-  </style>
+  </style> -->
 </head>  
 <body data-theme="dark">
   <main class="container">
@@ -50,15 +52,50 @@
     <!-- Opponents -->
     <div class="section">
       <h2>Opponents</h2>
-      <table>
-        <thead>
-          <tr><th>Opponent</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
-        </thead>
-        <tbody>
-          {% if summary.opponents is not none and not summary.opponents.empty %}
-            {% for row in summary.opponents.to_dict(orient='records') %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Opponent</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
+          </thead>
+          <tbody>
+            {% if summary.opponents is not none and not summary.opponents.empty %}
+              {% for row in summary.opponents.to_dict(orient='records') %}
+                <tr>
+                  <td>{{ row['opponent'] }}</td>
+                  <td>{{ row['games'] }}</td>
+                  <td>{{ row['wins'] }}</td>
+                  <td>{{ row['losses'] }}</td>
+                  <td>{{ (row['win_pct']*100)|round(1) }}%</td>
+                  <td>{{ row['goals_for'] }}</td>
+                  <td>{{ row['goals_against'] }}</td>
+                  <td>{{ row['goal_diff'] }}</td>
+                  <td>{{ row['player_1_goals'] }}</td>
+                  <td>{{ row['player_2_goals'] }}</td>
+                  <td>{{ row['p1_goal_pct'] }}</td>
+                  <td>{{ row['p2_goal_pct'] }}</td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="8" class="muted">No opponent data.</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Maps -->
+    <div class="section">
+      <h2>Maps</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Map</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
+          </thead>
+          <tbody>
+            {% if summary.maps is not none and not summary.maps.empty %}
+              {% for row in summary.maps.to_dict(orient='records') %}
               <tr>
-                <td>{{ row['opponent'] }}</td>
+                <td>{{ row['map'] }}</td>
                 <td>{{ row['games'] }}</td>
                 <td>{{ row['wins'] }}</td>
                 <td>{{ row['losses'] }}</td>
@@ -71,26 +108,28 @@
                 <td>{{ row['p1_goal_pct'] }}</td>
                 <td>{{ row['p2_goal_pct'] }}</td>
               </tr>
-            {% endfor %}
-          {% else %}
-            <tr><td colspan="8" class="muted">No opponent data.</td></tr>
-          {% endif %}
-        </tbody>
-      </table>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="8" class="muted">No map data.</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <!-- Maps -->
+    <!-- Home vs Away -->
+    {% if summary.home_away is not none and not summary.home_away.empty %}
     <div class="section">
-      <h2>Maps</h2>
-      <table>
-        <thead>
-           <tr><th>Map</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
-        </thead>
-        <tbody>
-          {% if summary.maps is not none and not summary.maps.empty %}
-            {% for row in summary.maps.to_dict(orient='records') %}
+      <h2>Home vs Away</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Home or Away</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
+          </thead>
+          <tbody>
+            {% for row in summary.home_away.to_dict(orient='records') %}
             <tr>
-              <td>{{ row['map'] }}</td>
+              <td>{{ row['home_or_away'] }}</td>
               <td>{{ row['games'] }}</td>
               <td>{{ row['wins'] }}</td>
               <td>{{ row['losses'] }}</td>
@@ -104,40 +143,9 @@
               <td>{{ row['p2_goal_pct'] }}</td>
             </tr>
             {% endfor %}
-          {% else %}
-            <tr><td colspan="8" class="muted">No map data.</td></tr>
-          {% endif %}
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Home vs Away -->
-    {% if summary.home_away is not none and not summary.home_away.empty %}
-    <div class="section">
-      <h2>Home vs Away</h2>
-      <table>
-        <thead>
-          <tr><th>Home or Away</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
-        </thead>
-        <tbody>
-          {% for row in summary.home_away.to_dict(orient='records') %}
-          <tr>
-            <td>{{ row['home_or_away'] }}</td>
-            <td>{{ row['games'] }}</td>
-            <td>{{ row['wins'] }}</td>
-            <td>{{ row['losses'] }}</td>
-            <td>{{ (row['win_pct']*100)|round(1) }}%</td>
-            <td>{{ row['goals_for'] }}</td>
-            <td>{{ row['goals_against'] }}</td>
-            <td>{{ row['goal_diff'] }}</td>
-            <td>{{ row['player_1_goals'] }}</td>
-            <td>{{ row['player_2_goals'] }}</td>
-            <td>{{ row['p1_goal_pct'] }}</td>
-            <td>{{ row['p2_goal_pct'] }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </div>
     {% endif %}
 
@@ -145,29 +153,31 @@
     {% if summary.tournaments is not none and not summary.tournaments.empty %}
     <div class="section">
       <h2>Tournaments</h2>
-      <table>
-        <thead>
-          <tr><th>Tournament #</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
-        </thead>
-        <tbody>
-          {% for row in summary.tournaments.to_dict(orient='records') %}
-          <tr>
-            <td>{{ row['tournament_no'] }}</td>
-            <td>{{ row['games'] }}</td>
-            <td>{{ row['wins'] }}</td>
-            <td>{{ row['losses'] }}</td>
-            <td>{{ (row['win_pct']*100)|round(1) }}%</td>
-            <td>{{ row['goals_for'] }}</td>
-            <td>{{ row['goals_against'] }}</td>
-            <td>{{ row['goal_diff'] }}</td>
-            <td>{{ row['player_1_goals'] }}</td>
-            <td>{{ row['player_2_goals'] }}</td>
-            <td>{{ row['p1_goal_pct'] }}</td>
-            <td>{{ row['p2_goal_pct'] }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Tournament #</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
+          </thead>
+          <tbody>
+            {% for row in summary.tournaments.to_dict(orient='records') %}
+            <tr>
+              <td>{{ row['tournament_no'] }}</td>
+              <td>{{ row['games'] }}</td>
+              <td>{{ row['wins'] }}</td>
+              <td>{{ row['losses'] }}</td>
+              <td>{{ (row['win_pct']*100)|round(1) }}%</td>
+              <td>{{ row['goals_for'] }}</td>
+              <td>{{ row['goals_against'] }}</td>
+              <td>{{ row['goal_diff'] }}</td>
+              <td>{{ row['player_1_goals'] }}</td>
+              <td>{{ row['player_2_goals'] }}</td>
+              <td>{{ row['p1_goal_pct'] }}</td>
+              <td>{{ row['p2_goal_pct'] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
     {% endif %}
 
@@ -175,29 +185,31 @@
     {% if summary.phases is not none and not summary.phases.empty %}
     <div class="section">
       <h2>Group vs Knockout</h2>
-      <table>
-        <thead>
-          <tr><th>Stage</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
-        </thead>
-        <tbody>
-          {% for row in summary.phases.to_dict(orient='records') %}
-          <tr>
-            <td>{{ row['phase'] }}</td>
-            <td>{{ row['games'] }}</td>
-            <td>{{ row['wins'] }}</td>
-            <td>{{ row['losses'] }}</td>
-            <td>{{ (row['win_pct']*100)|round(1) }}%</td>
-            <td>{{ row['goals_for'] }}</td>
-            <td>{{ row['goals_against'] }}</td>
-            <td>{{ row['goal_diff'] }}</td>
-            <td>{{ row['player_1_goals'] }}</td>
-            <td>{{ row['player_2_goals'] }}</td>
-            <td>{{ row['p1_goal_pct'] }}</td>
-            <td>{{ row['p2_goal_pct'] }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Stage</th><th>Games</th><th>Wins</th><th>Losses</th><th>Win %</th><th>GF</th><th>GA</th><th>GD</th><th>P1 Goals</th><th>P2 Goals</th><th>P1 Goal %</th><th>P2 Goal %</th></tr>
+          </thead>
+          <tbody>
+            {% for row in summary.phases.to_dict(orient='records') %}
+            <tr>
+              <td>{{ row['phase'] }}</td>
+              <td>{{ row['games'] }}</td>
+              <td>{{ row['wins'] }}</td>
+              <td>{{ row['losses'] }}</td>
+              <td>{{ (row['win_pct']*100)|round(1) }}%</td>
+              <td>{{ row['goals_for'] }}</td>
+              <td>{{ row['goals_against'] }}</td>
+              <td>{{ row['goal_diff'] }}</td>
+              <td>{{ row['player_1_goals'] }}</td>
+              <td>{{ row['player_2_goals'] }}</td>
+              <td>{{ row['p1_goal_pct'] }}</td>
+              <td>{{ row['p2_goal_pct'] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
     {% endif %}
 
@@ -219,67 +231,51 @@
 
         <details>
           <summary>Final ratings (team_player + opponents)</summary>
-          <table>
-            <thead><tr><th>Entity</th><th>Elo</th></tr></thead>
-            <tbody>
-              {% for row in summary.elo.table %}
-                <tr><td>{{ row['entity'] }}</td><td>{{ row['rating'] | round(0) }}</td></tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </details>
-
-        <!-- <details>
-          <summary>Recent matches — pre-match p(win)</summary>
+          <div class="table-wrap">
             <table>
-            <thead>
-              <tr><th>Date</th><th>Opponent</th><th>H/A</th><th>Result</th><th>p(win)</th></tr>
-            </thead>
-            <tbody>
-              {% for r in summary.recent %}
-                <tr>
-                  <td>{{ r['date'] }}</td>
-                  <td>{{ r['opponent'] }}</td>
-                  <td>{{ r['home_or_away'] }}</td>
-                  <td>{{ r['result'] }}</td>
-                  <td>{{ r['p_win_pre'] }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </details> -->
+              <thead><tr><th>Entity</th><th>Elo</th></tr></thead>
+              <tbody>
+                {% for row in summary.elo.table %}
+                  <tr><td>{{ row['entity'] }}</td><td>{{ row['rating'] | round(0) }}</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </details>
 
         <details>
           <summary>Recent matches — pre-match p(win)</summary>
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Opponent</th>
-                <th>H/A</th>
-                <th>Result</th>
-                <th>p(win)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for r in summary.recent %}
-                {% set d = r['delta'] %}
-                <tr class="{% if r['underdog_win'] %}up-win{% elif r['favored_loss'] %}up-loss{% endif %}">
-                  <td>{{ r['date_str'] }}</td>
-                  <td>{{ r['opponent'] }}</td>
-                  <td>{{ r['home_or_away'] }}</td>
-                  <td>{{ r['result'] }}</td>
-
-                  <td>
-                    <div class="smallbar">
-                      <span style="width: {{ (r['p_win_pre'] * 100) | round(0) }}%"></span>
-                    </div>
-                    <span class="muted small">{{ (r['p_win_pre'] * 100) | round(0) }}%</span>
-                  </td>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Opponent</th>
+                  <th>H/A</th>
+                  <th>Result</th>
+                  <th>p(win)</th>
                 </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {% for r in summary.recent %}
+                  {% set d = r['delta'] %}
+                  <tr class="{% if r['underdog_win'] %}up-win{% elif r['favored_loss'] %}up-loss{% endif %}">
+                    <td>{{ r['date_str'] }}</td>
+                    <td>{{ r['opponent'] }}</td>
+                    <td>{{ r['home_or_away'] }}</td>
+                    <td>{{ r['result'] }}</td>
+
+                    <td>
+                      <div class="smallbar">
+                        <span style="width: {{ (r['p_win_pre'] * 100) | round(0) }}%"></span>
+                      </div>
+                      <span class="muted small">{{ (r['p_win_pre'] * 100) | round(0) }}%</span>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </details>
 
 
@@ -288,28 +284,56 @@
     {% endif %}
 
 
-    <!-- Recent matches
-    {% if summary.recent %}
-      <div class="card">
-        <h3>Recent Matches</h3>
+    {% if summary.calibration %}
+    <section>
+      <h2>Calibration</h2>
+      <p class="muted">Brier score: <strong>{{ summary.calibration.brier }}</strong></p>
+      <p>Calibration shows how well our pre-game win percentages matched reality.</p>
+
+      <details open>
+        <summary>Reliability bins</summary>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Bin</th><th>Mean p</th><th>Emp. rate</th><th>N</th><th>Gap</th></tr></thead>
+            <tbody>
+              {% for b in summary.calibration.bins if b['n']|int > 0 %}
+                <tr>
+                  <td>{{ b.get('label', b['bin']) }}</td>
+                  <td>{{ (b['mean_p'] * 100) | round(1) }}%</td>
+                  <td>{{ (b['emp_rate'] * 100) | round(1) }}%</td>
+                  <td>{{ b['n'] }}</td>
+                  <td>{{ ((b['emp_rate'] - b['mean_p']) * 100) | round(1) }} pp</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+    {% endif %}
+
+    {% if summary.scouting %}
+    <section>
+      <h2>Opponent scouting (last {{ summary.scout_recent or 10 }})</h2>
+      <div class="table-wrap">
         <table>
-          <thead>
-            <tr><th>Date</th><th>Opponent</th><th>H/A</th><th>Result</th><th>p(win)</th></tr>
-          </thead>
+          <thead><tr><th>Opponent</th><th>N</th><th>W</th><th>Win%</th><th>Last</th></tr></thead>
           <tbody>
-            {% for r in summary.recent %}
+            {% for r in summary.scouting %}
               <tr>
-                <td>{{ r['date'] }}</td>
                 <td>{{ r['opponent'] }}</td>
-                <td>{{ r['home_or_away'] }}</td>
-                <td>{{ r['result'] }}</td>
-                <td>{{ r['p_win_pre'] }}</td>
+                <td>{{ r['n'] }}</td>
+                <td>{{ r['wins'] }}</td>
+                <td>{{ (r['win_pct'] * 100) | round(0) }}%</td>
+                <td>{{ r['last_result'] }}</td>
               </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
-    {% endif %} -->
+    </section>
+    {% endif %}
+
 
 
 
