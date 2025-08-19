@@ -61,10 +61,25 @@ def test_report_writes_file(tmp_path: Path):
     # Render the Jinja template with computed metrics to disk.
     build_html_report(clean, summary, out_html)
 
+    html = out_html.read_text(encoding="utf-8")
+
     # ---------- Assert ----------
     # 1) File was created.
     assert out_html.exists()
 
+    # linked CSS (external)
+    assert "styles.css" in html
+
     # 2) It contains the expected heading from the template.
-    html = out_html.read_text(encoding="utf-8")
     assert "Soccer Analytics — Report" in html
+
+    # 3) It contains a few section headers
+    assert "<h2>Calibration</h2>" in html
+    assert "Reliability bins" in html
+    assert "<h2>Opponent scouting" in html
+
+    # 4) It contains a few table headers
+    assert "<th>Opponent</th>" in html
+    assert "<th>Map</th>" in html
+
+
