@@ -79,7 +79,7 @@ def update(ra: float, rb: float, score_a: float, k: float) -> Tuple[float, float
     return ra2, rb2
 
 
-def run_elo(df: pd.DataFrame, k: float = 20.0, base: float = 1500.0, home_adv: float = 50.0, ) -> tuple[pd.DataFrame, pd.Series]:
+def run_elo(df: pd.DataFrame, k: float = 20.0, base: float = 1500.0, home_adv: float = 50.0, mov: str = "none", mov_alpha: float = 0.5) -> tuple[pd.DataFrame, pd.Series]:
     """Compute Elo for the focal 'team_player' across the match log.
 
     The function iterates chronologically over `df`, keeping a rating for the
@@ -150,6 +150,21 @@ def run_elo(df: pd.DataFrame, k: float = 20.0, base: float = 1500.0, home_adv: f
 
         # Actual result as 1.0/0.0
         score_a = 1.0 if row["result"] == "W" else 0.0
+
+
+        # Margin of Victory scaling factor g
+        if mov == "simple":
+            mov_goals = abs(int(row.get("goals_for", 0)) - int(row.get("goals_against", 0)))
+            dr = abs(r_team_player_eff - r_opp_eff)
+            g = (0.0 if mov_goals == 0 else math.log(mov_goals + 1.0)) * (2.2 / (0.001 * dr + 2.2))
+        else:
+            g = 1.0
+
+        # scale the update by g
+        delta = k * g * (score_a - expected_score_team_player)
+        r_team_player_new_eff = r_team_player_eff + delta
+        r_opp_new_eff = r_opp_eff - delta
+
 
         # Update on EFFECTIVE ratings, then remove home-adv when storing back
         r_team_player_new_eff, r_opp_new_eff = update(r_team_player_eff, r_opp_eff, score_a, k)
