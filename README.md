@@ -6,15 +6,31 @@ Sports analytics pipeline: CSV → metrics → static HTML report
 [Soccer Match Analytics](https://alex-gorman.github.io/Soccer-Match-Analytics/)
 
 
-## Features (Stage 1)
-- Ingest multi-tournament CSV
-- Validate & normalize schema
-- Compute per-tournament, phase (Group vs Knockout), opponent, and map breakdowns
-- Percent columns: P1/P2 goal share per group.
-- Artifacts written to `out/`:
+## Features
+- Ingest multi-tournament CSV; validate & normalize schema.
+- Aggregations by opponent, map, home/away, optional tournament and phase.
+- Percent columns (P1/P2 goal share).
+- Elo engine with --elo-k and --elo-home-adv controls.
+- Pre-match win probability shown for each recent game.
+- Recent matches card with mini probability bars and Δ (upsets/favored losses highlighted).
+- Calibration section: Brier score + reliability bins table (how predicted win% matched reality).
+- Opponent scouting (last N) mini table (N defaults to 10).
+- Report (Jinja) with KPIs, Opponents, Maps, Home/Away, Tournaments, Stages, Elo & Recent, Calibration, Scouting.
+- Artifacts to `out/`:
   - `report.html`
   - `matches.parquet`
   - `summary_opponents.csv`, `summary_maps.csv`, `summary_tournaments.csv`
+
+
+## What the report shows
+- KPIs: games, wins, win%, goal diff, goals per game, P1/P2 goal share.
+- Opponents / Maps / Home vs Away / Tournaments / Group Stage vs Knockout: summary tables.
+- Elo & Win Probabilities: current rating, recent 10 with pre-match p(win), and upset highlights.
+- Calibration: Brier score and reliability bins:
+  - Mean p = average predicted win% in the bin.
+  - Emp. rate = actual win rate in that bin.
+  - Gap = Emp. rate − Mean p (positive = under-confident; negative = over-confident).
+- Opponent scouting (last N): count, wins, win%, last result vs each opponent in the recent window.
 
 
 ## Quick start
@@ -67,16 +83,18 @@ Derived in the pipeline: `result` (`W`/`L`), `phase` (`Group`/`Knockout`), `goal
 ## Project structure
 ```
 src/soccer/
-  io_csv.py      # CSV loader & schema validation
-  clean.py       # normalization (types, W/L, OT, dates, H/A, phase, goal_diff)
-  metrics.py     # aggregations and % columns (P1/P2 goal share)
-  report.py      # Jinja rendering (+ optional static asset copy)
-  cli.py         # `soccer` entrypoint
+  io_csv.py        # CSV loader & schema validation
+  clean.py         # normalization (types, W/L, OT, dates, H/A, phase, goal_diff)
+  metrics.py       # aggregations and % columns
+  calibration.py   # Brier score + reliability bins
+  elo.py           # Elo + p(win)
+  report.py        # Jinja render (copies/links static CSS)
+  cli.py           # `soccer` entrypoint
 templates/
-  report.html    # template used to render the report
-  static/style.css  # (optional) external stylesheet
+  report.html
+  static/styles.css
 data/
-  tournament_01.csv  # sample dataset
+  tournament_01.csv
 ```
 
 ## Testing
@@ -94,13 +112,11 @@ pytest tests/integration -q
 pytest tests/smoke -q
 ```
 
-## Stage 2 status
-- [x] Elo engine + p(win)
-- [x] Report: Elo card + Recent matches table with Δ and bars
-- [x] CLI flags (`--use-elo`, `--elo-k`, `--elo-home-adv`)
-- [ ] Calibration (Brier score, reliability curve)
-- [ ] Opponent scouting pages
-- [ ] Optional feature store (DuckDB/Parquet)
+
+## Stage 3 Future Work
+- Win-prob ML model
+- Experiment Tracking
+- feature store (DuckDB/Parquet)
 
 
 ## Releases
