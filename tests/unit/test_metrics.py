@@ -181,4 +181,74 @@ def test_maps_and_home_away_groups(df_small):
     assert counts["H"] == 2 and counts["A"] == 2
 
 
+def _toy_df():
+    """Synthetic mini-dataset to exercise Stage-2 code paths.
+
+    Contains 5 matches spanning multiple opponents, maps, home/away flags,
+    phases (Group + Knockout), and a pre-match probability column `p_win_pre`.
+    This is intentionally small but varied so `build_summary` produces
+    tournaments/phases groups, calibration blocks, and scouting output.
+    """
+    return pd.DataFrame(
+        [
+            # date, opp, map, H/A, result, gf, ga, p1, p2, t, phase, p
+            ("2025-08-01","Luigi","Crater Field","H","W",3,1,2,1,1,"Group",0.65),
+            ("2025-08-02","Yoshi","Underground","A","L",1,2,1,0,1,"Group",0.45),
+            ("2025-08-03","Luigi","Bowser Stadium","H","W",2,0,1,1,1,"Knockout",0.70),
+            ("2025-08-04","DK","Konga Coliseum","A","W",1,0,1,0,2,"Group",0.55),
+            ("2025-08-05","Yoshi","Crater Field","H","W",2,1,1,1,2,"Group",0.60),
+        ],
+        columns=[
+            "date","opponent","map","home_or_away","result",
+            "goals_for","goals_against","player_1_goals","player_2_goals",
+            "tournament_no","phase","p_win_pre",
+        ],
+    )
+
+
+@pytest.mark.filterwarnings("ignore:.*observed=False is deprecated.*:FutureWarning")
+def test_build_summary_includes_stage2_blocks():
+    """Ensure `build_summary` returns all Stage-2 sections and sane values.
+
+    Verifies:
+      • Overall KPIs exist and game count matches input size.
+      • Grouped tables exist: opponents, maps, home/away, tournaments, phases.
+      • Calibration dict includes a Brier score in [0,1] and the requested
+        number of reliability bins with expected fields.
+      • Scouting list exists with rows containing expected keys.
+    The warning filter silences a pandas future warning unrelated to behavior.
+    """
+    df = _toy_df()
+    summary = build_summary(
+        df,
+        per_tournament=True,
+        split_phase=True,
+        calibration_bins=5,
+        scout_recent=4,
+    )
+
+    # Overall exists
+    assert summary["overall"]["games"] == len(df)
+
+    # Grouped tables exist
+    assert not summary["opponents"].empty
+    assert not summary["maps"].empty
+    assert not summary["home_away"].empty
+    assert not summary["tournaments"].empty
+    assert not summary["phases"].empty
+
+    # Calibration present and sane
+    cal = summary["calibration"]
+    assert isinstance(cal, dict) and "brier" in cal and "bins" in cal
+    assert 0.0 <= cal["brier"] <= 1.0
+    assert cal["bins_count"] == 5
+    assert {"n","mean_p","emp_rate","gap"}.issubset(cal["bins"][0].keys())
+
+    # Scouting present
+    scouting = summary["scouting"]
+    assert isinstance(scouting, list) and len(scouting) > 0
+    # keys in scouting rows
+    assert {"opponent","n","wins","last_result","win_pct"}.issubset(scouting[0].keys())
+
+
 
