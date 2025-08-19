@@ -73,7 +73,9 @@ def test_smoke_pipeline(tmp_path: Path):
     assert "Soccer Analytics — Report" in text
     assert "Games" in text
 
+
 @pytest.mark.smoke
+@pytest.mark.filterwarnings("ignore:.*observed=False is deprecated.*:FutureWarning")
 def test_smoke_cli(tmp_path: Path):
     """Smoke test for the Typer-backed CLI (`main` function).
 
