@@ -28,16 +28,20 @@ from .metrics import build_summary
 from .report import build_html_report
 
 from .elo import run_elo
+from .calibration import brier_score, reliability_table
 
 
 def main(
     input: Annotated[Path, typer.Option(help="CSV input", exists=True, dir_okay=False, path_type=Path)],
     out: Annotated[Path, typer.Option(help="Output dir", file_okay=False, dir_okay=True)] = Path("out"),
-    per_tournament: Annotated[bool, typer.Option(help="Breakdown per tournament")] = False,
-    split_phase: Annotated[bool, typer.Option(help="Split group/knockout")] = False,
+    per_tournament: Annotated[bool, typer.Option(help="Breakdown per tournament")] = True,
+    split_phase: Annotated[bool, typer.Option(help="Split group/knockout")] = True,
     use_elo: Annotated[bool, typer.Option(help="Compute Elo ratings")] = True,
     elo_k: Annotated[float, typer.Option(help="Elo K-factor")] = 20.0,
     elo_home_adv: Annotated[float, typer.Option(help="Home-advantage points")] = 50.0,
+    elo_mov: Annotated[str, typer.Option("--elo-mov", help="MoV scaling: none|simple")] = "none",
+    calibration_bins: Annotated[int, typer.Option("--calibration-bins", min=2, max=50)] = 10,
+    scout_recent: Annotated[int, typer.Option("--scout-recent", help="N recent matches for scouting")] = 10,
 ):
     """Compute metrics and build a static HTML report from match CSVs.
 
@@ -46,15 +50,31 @@ def main(
       • Loads raw CSV data
       • Normalizes/cleans the DataFrame into a trusted schema
       • Builds summary metrics and optional breakdowns
-      • Writes machine-readable artifacts (Parquet + CSVs)
+      • Builds summary metrics, calibration bins, and scouting tables
+      • Persists machine-readable artifacts (Parquet + CSVs)
       • Renders a static HTML report
 
     Args:
-        input: Filesystem path to the source CSV (or folder; current implementation
-            expects a single CSV path).
-        out: Output directory where artifacts are written (created if missing).
-        per_tournament: If True, include a tournament-level breakdown table.
-        split_phase: If True, include a Group vs. Knockout breakdown table.
+        input : Path
+            Filesystem path to the source CSV. Must exist and be a file.
+        out : Path, default "out"
+            Output directory for artifacts; created if it does not exist.
+        per_tournament : bool, default True
+            Include a per-tournament breakdown in the report and exports.
+        split_phase : bool, default True
+            Include a Group vs. Knockout breakdown in the report and exports.
+        use_elo : bool, default True
+            If True, compute Elo ratings and p(win) columns.
+        elo_k : float, default 20.0
+            K-factor for Elo updates (higher → faster rating movement).
+        elo_home_adv : float, default 50.0
+            Additive home-advantage points in Elo expectations.
+        elo_mov : {"none","simple"}, default "none"
+            Margin-of-victory scaling mode for Elo updates.
+        calibration_bins : int, default 10
+            Number of reliability bins for calibration (0–1 split into bins).
+        scout_recent : int, default 10
+            Number of most-recent matches to summarize for opponent scouting.
 
     Raises:
         typer.BadParameter: If the input path does not exist.
@@ -78,7 +98,7 @@ def main(
     # Stage 2 — add Elo columns and final ratings
     final_ratings = None
     if use_elo:
-        df, final_ratings = run_elo(df, k=elo_k, base=1500.0, home_adv=elo_home_adv)
+        df, final_ratings = run_elo(df, k=elo_k, base=1500.0, home_adv=elo_home_adv, mov=elo_mov)
         if final_ratings is not None:
             final_ratings.to_csv(out / "ratings.csv", header=["rating"])
 
@@ -86,7 +106,7 @@ def main(
     df.to_parquet(out / "matches.parquet")
 
     # Build summary dict with overall KPIs and optional breakdowns.
-    summary = build_summary(df, per_tournament=per_tournament, split_phase=split_phase)
+    summary = build_summary(df, per_tournament=per_tournament, split_phase=split_phase, calibration_bins=calibration_bins, scout_recent=scout_recent, final_ratings=final_ratings)
 
     # pass small Elo block to the template
     if final_ratings is not None:
@@ -127,6 +147,7 @@ def main(
 
     summary["recent"] = recent[keep_cols].to_dict("records")
     
+    # Aggregate one-line recent summary for the Elo card
     wins = int(recent["result_num"].sum())
     n = len(recent)
     summary_line = {
@@ -141,7 +162,7 @@ def main(
 
 
 
-    # Save some rollups (guard in case any are empty)
+    # --- Persist rollups (guard against empties) ---
     opp = summary.get("opponents", pd.DataFrame())
     if hasattr(opp, "to_csv") and not getattr(opp, "empty", True):
         opp.to_csv(out / "summary_opponents.csv", index=False)
