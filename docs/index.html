@@ -7,25 +7,123 @@
   <!-- <link rel="stylesheet" href="./styles.css"> -->
   <link rel="stylesheet" href="styles.css">
 
-  <!-- <style>
-    
-    body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 2rem; color: #111; }
-    h1, h2 { margin-bottom: 0.25rem; }
-    .muted { color: #6b7280; }
+  <style>
+    /* ---------- light, clean portfolio-ish styles ---------- */
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #f9fafb;      /* very light gray */
+      color: #0f172a;           /* slate-900 */
+      font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: clamp(20px, 3vw, 32px);   /* equal padding on ALL sides */
+    }
+
+    h1 {
+      margin: 0 0 .4rem;
+      font-size: clamp(28px, 3.2vw, 40px);
+      letter-spacing: -0.02em;
+      color: #0f172a;
+    }
+    h2 { margin: 0 0 .4rem; font-size: clamp(18px, 2.2vw, 22px); }
+    .muted { color: #64748b; }
     .small { font-size: 12px; }
     .section { margin-top: 2rem; }
-    .kpis { display: grid; grid-template-columns: repeat(5, minmax(120px, 1fr)); gap: 12px; margin: 1rem 0 2rem; }
-    .kpi { border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; background: #fafafa; }
-    .kpi .label { color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
-    .kpi .value { font-weight: 700; font-size: 22px; }
-    table { width: 100%; border-collapse: collapse; margin: 1rem 0 2rem; }
-    th, td { border: 1px solid #e5e7eb; padding: 8px 10px; text-align: left; font-size: 14px; }
-    th { background: #f3f4f6; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .table-wrap { overflow-x: auto; }
-    /* table { min-width: 900px; } */ /* or 1100px if you keep many columns */
-    
-  </style> -->
+
+    /* KPIs */
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 14px;
+      margin: 1rem 0 2rem;
+    }
+    .kpi {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+
+    .kpi .label { color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+    .kpi .value { font-weight: 700; font-size: 22px; margin-top: 6px; }
+
+    /* Content layout: always single column so tables stack */
+    .grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+    .grid > * { min-width: 0; }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 14px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+    thead th {
+      background: #f3f4f6;
+      color: #0f172a;
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    /* row lines */
+    td { padding: 10px 12px; border-top: 1px solid #e5e7eb; }
+    /* column separators */
+    thead th + th,
+    tbody td + td,
+    tfoot td + td { border-left: 1px solid #e5e7eb; }
+
+    tbody tr:nth-child(odd) { background: #f8fafc; }  /* subtle zebra */
+    tbody tr:hover { background: #eef2ff; }            /* gentle hover */
+
+    /* details/summary blocks */
+    details {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-top: .5rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+    summary { cursor: pointer; font-weight: 600; }
+
+    /* tiny probability bar */
+    .smallbar {
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 9999px;
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+    .smallbar span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, #2563eb, #22d3ee);
+    }
+
+    /* optional outcome highlights */
+    .up-win td { background: rgba(16,185,129,.12); }
+    .up-loss td { background: rgba(239,68,68,.12); }
+
+    /* responsiveness */
+    @media (max-width: 600px) {
+      table { font-size: 13px; }
+      .container { padding: 16px; }  /* still equal on all sides */
+    }
+  </style>
+
+  
 </head>  
 <body data-theme="dark">
   <main class="container">
