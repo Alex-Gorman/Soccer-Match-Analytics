@@ -31,3 +31,20 @@ date,tournament_no,round,game_no,map,opponent,home_or_away,win_or_loss,ot,score,
 2025-08-01,2,Group,14,Crater Field,Luigi,A,W,no,1-0,1,0,1,0,14,0
 2025-08-01,2,Semifinal,15,Bowser Stadium,DK,H,W,no,2-1,2,1,1,1,7,4
 2025-08-01,2,Final,16,Bowser Stadium,Wario,A,L,no,1-2,1,2,1,0,9,8
+2025-08-04,3,Group,1,Crater Field,Luigi,H,W,no,2-0,2,0,1,1,7,5
+2025-08-04,3,Group,2,Pipeline Central,DK,A,W,no,2-1,2,1,1,1,10,5
+2025-08-04,3,Group,3,Konga Coliseum,Waluigi,A,W,no,2-1,2,1,2,0,5,5
+2025-08-04,3,Group,4,Crater Field,Yoshi,H,W,no,4-1,4,1,2,2,9,10
+2025-08-04,3,Group,5,Konga Coliseum,Mario,H,W,yes,1-0,1,0,0,1,11,6
+2025-08-04,3,Group,6,The Palace,Daisy,A,W,no,2-1,2,1,1,1,10,1
+2025-08-04,3,Group,7,Pipeline Central,Wario,H,W,no,2-0,2,0,2,0,9,3
+2025-08-04,3,Group,8,Crater Field,Luigi,A,W,no,7-1,7,1,2,5,11,5
+2025-08-04,3,Group,9,Underground,DK,H,W,yes,2-1,2,1,1,1,12,4
+2025-08-04,3,Group,10,Konga Coliseum,Waluigi,H,W,yes,3-2,3,2,1,2,9,7
+2025-08-04,3,Group,11,Crater Field,Yoshi,A,W,no,3-0,3,0,2,1,9,8
+2025-08-04,3,Group,12,Konga Coliseum,Mario,A,W,yes,2-1,2,1,1,1,8,3
+2025-08-04,3,Group,13,Crater Field,Daisy,H,W,no,2-1,2,1,0,2,9,7
+2025-08-04,3,Group,14,Underground,Wario,A,W,no,4-2,4,2,1,3,9,5
+2025-08-04,3,Semifinal,15,Bowser Stadium,Yoshi,H,W,no,4-0,4,0,2,2,9,7
+2025-08-04,3,Final,16,Bowser Stadium,Luigi,H,W,no,2-0,2,0,1,1,6,5
+
